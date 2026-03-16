@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FilmFuse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #1f2933, #020617);
+      color: #f9fafb;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: #020617cc;
+      border-radius: 24px;
+      padding: 24px 20px 28px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+      border: 1px solid #1f2937;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #0f172a;
+      border: 1px solid #1f2937;
+      margin-bottom: 16px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background-color: #22c55e;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin: 0 0 8px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      font-size: 14px;
+      color: #d1d5db;
+    }
+
+    .card {
+      margin-top: 14px;
+      padding: 16px;
+      background: radial-gradient(circle at top left,#111827,#020617);
+      border-radius: 20px;
+      border: 1px solid #1f2937;
+    }
+
+    .button {
+      width: 100%;
+      padding: 12px 16px;
+      margin-top: 16px;
+      border-radius: 999px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      background: linear-gradient(90deg,#22c55e,#16a34a);
+      color: #022c22;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.12s;
+      box-shadow: 0 8px 22px rgba(34,197,94,0.35);
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button:active {
+      transform: translateY(0);
+      box-shadow: none;
+      opacity: 0.9;
+    }
+
+    .button-secondary {
+      background: transparent;
+      border: 1px solid #4b5563;
+      color: #e5e7eb;
+      box-shadow: none;
+      margin-top: 10px;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .field {
+      margin-top: 12px;
+      padding: 10px 10px 8px;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid #111827;
+    }
+
+    .field label.title {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #e5e7eb;
+    }
+
+    .option-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      position: relative;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .chip.selected {
+      border-color: #22c55e;
+      background: #022c22;
+      color: #bbf7d0;
+    }
+
+    .results-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .movie-item {
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      margin-bottom: 8px;
+    }
+
+    .movie-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .movie-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .movie-desc {
+      font-size: 12px;
+      color: #d1d5db;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Screen 1 -->
+    <div id="screen-landing" class="screen active">
+      <div class="logo">● FilmFuseAI</div>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>AI-powered movie picker</span>
+      </div>
+
+      <h1>Find your perfect movie tonight.</h1>
+      <p>Answer a few questions and let FilmFuseAI build a custom watchlist.</p>
+
+      <div class="card">
+        <p style="font-size:13px;margin:0;">
+          Flow: Main → Questions → Recommended movies.
+        </p>
+      </div>
+
+      <button class="button" onclick="goToQuestions()">Get Started</button>
+    </div>
+
+    <!-- Screen 2 -->
+    <div id="screen-questions" class="screen">
+      <div class="logo">● FilmFuseAI</div>
+      <p style="font-size:13px;margin-bottom:10px;">Step 1 of 2</p>
+      <h1>Tell us what you’re in the mood for.</h1>
+
+      <div class="field">
+        <label class="title">Preferred language(s)</label>
+        <div class="option-row" data-group="language">
+          <label class="chip"><input type="checkbox" value="english" />English</label>
+          <label class="chip"><input type="checkbox" value="hindi" />Hindi</label>
+          <label class="chip"><input type="checkbox" value="korean" />Korean</label>
+          <label class="chip"><input type="checkbox" value="japanese" />Japanese</label>
+          <label class="chip"><input type="checkbox" value="spanish" />Spanish</label>
+          <label class="chip"><input type="checkbox" value="other" />Any</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="title">Genres</label>
+        <div class="option-row" data-group="genre">
+          <label class="chip"><input type="checkbox" value="action" />Action</label>
+          <label class="chip"><input type="checkbox" value="scifi" />Sci-Fi</label>
+          <label class="chip"><input type="checkbox" value="romance" />Romance</label>
+          <label class="chip"><input type="checkbox" value="thriller" />Thriller</label>
+          <label class="chip"><input type="checkbox" value="comedy" />Comedy</label>
+          <label class="chip"><input type="checkbox" value="animation" />Animation/Anime</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="title">Mood</label>
+        <div class="option-row" data-group="mood">
+          <label class="chip"><input type="radio" name="mood" value="chill" />Chill</label>
+          <label class="chip"><input type="radio" name="mood" value="intense" />Intense</label>
+          <label class="chip"><input type="radio" name="mood" value="feelgood" />Feel-good</label>
+          <label class="chip"><input type="radio" name="mood" value="mindbend" />Mind-bending</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="title">Age rating</label>
+        <div class="option-row" data-group="age">
+          <label class="chip"><input type="radio" name="age" value="all" />All ages</label>
+          <label class="chip"><input type="radio" name="age" value="13+" />13+</label>
+          <label class="chip"><input type="radio" name="age" value="16+" />16+</label>
+          <label class="chip"><input type="radio" name="age" value="18+" />18+</label>
+        </div>
+      </div>
+
+      <button class="button" onclick="generateMovies()">Generate my movies</button>
+      <button class="button button-secondary" onclick="goToLanding()">Back</button>
+    </div>
+
+    <!-- Screen 3 -->
+    <div id="screen-results" class="screen">
+      <div class="logo">● FilmFuseAI</div>
+      <p style="font-size:13px;margin-bottom:10px;">Step 2 of 2</p>
+      <h1>Your AI-picked watchlist.</h1>
+      <p style="font-size:13px;">Based on your language, genre, mood & age preferences.</p>
+
+      <ul id="results" class="results-list"></ul>
+
+      <button class="button" onclick="goToQuestions()">Tweak my answers</button>
+      <button class="button button-secondary" onclick="goToLanding()">Start over</button>
+    </div>
+  </div>
+
+  <script>
+    const screens = {
+      landing: document.getElementById("screen-landing"),
+      questions: document.getElementById("screen-questions"),
+      results: document.getElementById("screen-results"),
+    };
+
+    function showScreen(name) {
+      Object.values(screens).forEach((s) => s.classList.remove("active"));
+      screens[name].classList.add("active");
+    }
+
+    function goToLanding() { showScreen("landing"); }
+    function goToQuestions() { showScreen("questions"); }
+
+    // chip behaviour
+    document.querySelectorAll(".option-row .chip").forEach((chip) => {
+      const input = chip.querySelector("input");
+      chip.addEventListener("click", (e) => {
+        if (e.target.tagName.toLowerCase() === "input") return;
+        if (input.type === "checkbox") {
+          input.checked = !input.checked;
+          chip.classList.toggle("selected", input.checked);
+        } else if (input.type === "radio") {
+          const name = input.name;
+          document.querySelectorAll(`input[name="${name}"]`).forEach((r) => {
+            r.parentElement.classList.toggle("selected", r === input);
+          });
+          input.checked = true;
+        }
+      });
+    });
+
+    function getSelectedValues(groupAttr) {
+      const row = document.querySelector(`.option-row[data-group="${groupAttr}"]`);
+      if (!row) return [];
+      return Array.from(row.querySelectorAll("input:checked")).map((i) => i.value);
+    }
+
+    function getRadioValue(name) {
+      const input = document.querySelector(`input[name="${name}"]:checked`);
+      return input ? input.value : null;
+    }
+
+    async function generateMovies() {
+      const langs = getSelectedValues("language");
+      const genres = getSelectedValues("genre");
+      const mood = getRadioValue("mood");
+      const age = getRadioValue("age");
+
+      const payload = { languages: langs, genres, mood, age };
+
+      const list = document.getElementById("results");
+      list.innerHTML = `
+        <li class="movie-item">
+          <div class="movie-title">Thinking…</div>
+          <div class="movie-desc">FilmFuseAI is generating a custom watchlist for you.</div>
+        </li>
+      `;
+      showScreen("results");
+
+      try {
+        const res = await fetch("http://localhost:4000/api/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || "Bad response from server");
+        }
+
+        const data = await res.json(); // { movies: [...] }
+
+        list.innerHTML = "";
+
+        if (!data.movies || data.movies.length === 0) {
+          list.innerHTML = `
+            <li class="movie-item">
+              <div class="movie-title">No movies returned</div>
+              <div class="movie-desc">Try changing your preferences and generate again.</div>
+            </li>
+          `;
+          return;
+        }
+
+        data.movies.forEach((m) => {
+          const li = document.createElement("li");
+          li.className = "movie-item";
+          li.innerHTML = `
+            <div class="movie-title">${m.title} · ${m.year || ""}</div>
+            <div class="movie-meta">
+              ${(m.language || "").toUpperCase()} · Rated ${m.age_rating || "?"}
+              ${m.genres && m.genres.length ? " · " + m.genres.join(", ") : ""}
+            </div>
+            <div class="movie-desc">${m.short_reason}</div>
+          `;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        list.innerHTML = `
+          <li class="movie-item">
+            <div class="movie-title">Error</div>
+            <div class="movie-desc">${err.message}</div>
+          </li>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
